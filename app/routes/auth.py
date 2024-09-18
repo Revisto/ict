@@ -29,7 +29,7 @@ def login():
             session['user_id'] = user.id
             session['is_company'] = user.is_company
             if user.is_company:
-                return redirect(url_for('campaign.dashboard'))
+                return redirect(url_for('dashboard.dashboard'))
             else:
-                return redirect(url_for('campaign.user_dashboard'))
+                return redirect(url_for('dashboard.user_dashboard'))
     return render_template('login.html')

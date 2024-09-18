@@ -1,6 +1,7 @@
 # app/services/coupon_service.py
 from app.models import Coupon, Campaign
 from app import db
+from app.services.analytics_service import log_general_event
 import random
 import requests
 
@@ -29,6 +30,7 @@ def generate_public_coupon(campaign_id):
             if coupon.usage_limit is not None and coupon.usage_count >= coupon.usage_limit:
                 coupon.used = True
             db.session.commit()
+            log_general_event(campaign_id, None, 'coupon_given', {'coupon_code': coupon.code})
             return {'coupon_code': coupon.code}
         else:
             return None
@@ -39,12 +41,14 @@ def generate_onetime_coupon(campaign_id):
     if coupon:
         coupon.used = True
         db.session.commit()
+        log_general_event(campaign_id, None, 'coupon_given', {'coupon_code': coupon.code})
         return {'coupon_code': coupon.code}
     return None
 
 def generate_realtime_coupon(campaign):
     coupon_code = generate_coupon_code()
     if validate_realtime_coupon(campaign.webservice_url, coupon_code):
+        log_general_event(campaign.id, None, 'copuon_generated', {'coupon_code': coupon_code})
         return {'coupon_code': coupon_code}
     else:
         return None

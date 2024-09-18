@@ -48,6 +48,7 @@ class CampaignGame(db.Model):
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     embed_code = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    game = db.relationship('Game', backref='campaign_games')
 
 class Widget(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -55,3 +56,41 @@ class Widget(db.Model):
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
     embed_code = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class GameAnalytics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
+    game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    event_type = db.Column(db.String(50), nullable=False)  # e.g., 'wrong_answer', 'correct_answer'
+    event_data = db.Column(db.JSON, nullable=True)  # Additional data specific to the event
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'game_id': self.game_id,
+            'user_id': self.user_id,
+            'event_type': self.event_type,
+            'event_data': self.event_data,
+            'created_at': self.created_at.isoformat()
+        }
+
+class GeneralAnalytics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    event_type = db.Column(db.String(50), nullable=False)  # e.g., 'coupon_given', 'game_attempt'
+    event_data = db.Column(db.JSON, nullable=True)  # Additional data specific to the event
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'campaign_id': self.campaign_id,
+            'user_id': self.user_id,
+            'event_type': self.event_type,
+            'event_data': self.event_data,
+            'created_at': self.created_at.isoformat()
+        }

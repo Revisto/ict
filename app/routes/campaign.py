@@ -1,6 +1,7 @@
 # app/routes/campaign.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models import Campaign, Coupon, Game, CampaignGame, UserCampaignScore
+from app.services.analytics_service import log_general_event
 from app.decorators import login_required
 from app import db
 
@@ -16,7 +17,8 @@ def create_campaign():
     new_campaign = Campaign(name=name, user_id=user_id, campaign_type=campaign_type)
     db.session.add(new_campaign)
     db.session.commit()
-    return redirect(url_for('campaign.dashboard'))
+    log_general_event(new_campaign.id, user_id, 'campaign_created', {'name': name, 'campaign_type': campaign_type})
+    return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/upload_coupons/<int:campaign_id>', methods=['POST'])
 def upload_coupons(campaign_id):
@@ -31,7 +33,8 @@ def upload_coupons(campaign_id):
         new_coupon = Coupon(campaign_id=campaign_id, code=code.strip(), type=coupon_type, usage_limit=usage_limit)
         db.session.add(new_coupon)
     db.session.commit()
-    return redirect(url_for('campaign.dashboard'))
+    log_general_event(campaign_id, session['user_id'], 'coupons_uploaded', {'count': len(codes), 'coupon_type': coupon_type})
+    return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/update_webservice_url/<int:campaign_id>', methods=['POST'])
 def update_webservice_url(campaign_id):
@@ -41,7 +44,7 @@ def update_webservice_url(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     campaign.webservice_url = webservice_url
     db.session.commit()
-    return redirect(url_for('campaign.dashboard'))
+    return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/delete_webservice_url/<int:campaign_id>', methods=['POST'])
 def delete_webservice_url(campaign_id):
@@ -50,7 +53,7 @@ def delete_webservice_url(campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     campaign.webservice_url = None
     db.session.commit()
-    return redirect(url_for('campaign.dashboard'))
+    return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/select_games/<int:campaign_id>', methods=['POST'])
 def select_games(campaign_id):
@@ -65,7 +68,7 @@ def select_games(campaign_id):
         new_campaign_game = CampaignGame(campaign_id=campaign_id, game_id=game_id, embed_code=embed_code)
         db.session.add(new_campaign_game)
     db.session.commit()
-    return redirect(url_for('campaign.dashboard'))
+    return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/campaigns', methods=['GET'])
 def list_campaigns():
