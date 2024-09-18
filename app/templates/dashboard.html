@@ -1,3 +1,4 @@
+<!-- templates/dashboard.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +14,8 @@
     <ul>
         {% for campaign in campaigns %}
         <li>
+            <h2>{{ campaign.name }}</h2>
+
             {{ campaign.name }} - Total Coupons: {{ campaign.total_coupons }}, Used: {{ campaign.used_coupons }}, Remaining: {{ campaign.remaining_coupons }}
             <form method="POST" action="/upload_coupons/{{ campaign.id }}">
                 <input type="text" name="codes" placeholder="Comma-separated coupon codes" required>
@@ -38,25 +41,28 @@
             <form method="POST" action="/delete_webservice_url/{{ campaign.id }}">
                 <button type="submit">Delete URL</button>
             </form>
-            <h3>Public Coupons</h3>
+            <h4>Public Coupons</h4>
             <ul>
                 {% for coupon in campaign.public_coupons %}
                 <li>{{ coupon.code }} - Used: {{ coupon.usage_count }}/{{ coupon.usage_limit }}</li>
                 {% endfor %}
             </ul>
-            <h3>Onetime Coupons</h3>
+            <h4>Onetime Coupons</h4>
             <ul>
                 {% for coupon in campaign.onetime_coupons %}
                 <li>{{ coupon.code }} - Used: {{ 'Yes' if coupon.used else 'No' }}</li>
                 {% endfor %}
             </ul>
-            <h3>Games</h3>
+            <h4>Games</h4>
             <ul>
                 {% for campaign_game in campaign.games %}
                 <li>{{ campaign_game.game.name }} - Embed Code: {{ campaign_game.embed_code }}</li>
                 {% endfor %}
             </ul>
         </li>
+        <hr></hr>
+        <hr></hr>
+        <hr></hr>
         {% endfor %}
     </ul>
     <script>
@@ -66,5 +72,6 @@
                 .then(data => alert(`Embed Code: ${data.embed_code}`));
         }
     </script>
+    <script src="/static/js/widget.js" data-campaign-id="5" data-game-id="2"></script>
 </body>
 </html>

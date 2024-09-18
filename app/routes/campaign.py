@@ -1,3 +1,4 @@
+# app/routes/campaign.py
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from app.models import Campaign, Coupon, Game, CampaignGame
 from app import db

@@ -1,3 +1,4 @@
+# app/__init__.py
 from flask import Flask
 from flask_migrate import Migrate
 from app.extensions import db
@@ -12,10 +13,11 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from .routes import auth, campaign, widget
+    from .routes import auth, campaign, widget, game
     app.register_blueprint(auth.bp, name='auth')
     app.register_blueprint(campaign.bp, name='campaign')
     app.register_blueprint(widget.bp, name='widget')
+    app.register_blueprint(game.bp, name='game')
 
     #register_admin_views(app)
 
