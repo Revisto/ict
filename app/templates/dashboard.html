@@ -23,8 +23,13 @@
                 <input type="number" name="usage_limit" placeholder="Usage Limit (for public coupons)">
                 <button type="submit">Upload Coupons</button>
             </form>
-            <button onclick="generateWidget({{ campaign.id }})">Generate Widget</button>
-            <a href="/game/{{ campaign.id }}">Play Game</a>
+            <form method="POST" action="/select_games/{{ campaign.id }}">
+                <label>Select Games:</label>
+                {% for game in games %}
+                <input type="checkbox" name="game_ids" value="{{ game.id }}">{{ game.name }}
+                {% endfor %}
+                <button type="submit">Select Games</button>
+            </form>
             <h3>Public Coupons</h3>
             <ul>
                 {% for coupon in campaign.public_coupons %}
@@ -37,20 +42,18 @@
                 <li>{{ coupon.code }} - Used: {{ 'Yes' if coupon.used else 'No' }}</li>
                 {% endfor %}
             </ul>
-            <h3>Manage Webservice URL</h3>
-            <form method="POST" action="/update_webservice_url/{{ campaign.id }}">
-                <input type="text" name="webservice_url" value="{{ campaign.webservice_url }}" placeholder="Webservice URL">
-                <button type="submit">Update URL</button>
-            </form>
-            <form method="POST" action="/delete_webservice_url/{{ campaign.id }}">
-                <button type="submit">Delete URL</button>
-            </form>
+            <h3>Games</h3>
+            <ul>
+                {% for campaign_game in campaign.games %}
+                <li>{{ campaign_game.game.name }} - Embed Code: {{ campaign_game.embed_code }}</li>
+                {% endfor %}
+            </ul>
         </li>
         {% endfor %}
     </ul>
     <script>
-        function generateWidget(campaignId) {
-            fetch(`/generate_widget/${campaignId}`)
+        function generateWidget(campaignId, gameId) {
+            fetch(`/generate_widget/${campaignId}/${gameId}`)
                 .then(response => response.json())
                 .then(data => alert(`Embed Code: ${data.embed_code}`));
         }

@@ -1,27 +1,42 @@
 from flask import Blueprint, jsonify, render_template, request, session, redirect, url_for
-from app.models import Campaign, Widget, Coupon
+from app.models import Campaign, Widget, Coupon, Game, CampaignGame
 from app import db
 import random
 import requests
 
 bp = Blueprint('widget', __name__)
 
-@bp.route('/generate_widget/<int:campaign_id>')
-def generate_widget(campaign_id):
-    embed_code = f'<iframe src="/widget/{campaign_id}" width="300" height="400"></iframe>'
+@bp.route('/generate_widget/<int:campaign_id>/<int:game_id>')
+def generate_widget(campaign_id, game_id):
+    embed_code = f'<iframe src="/widget/{campaign_id}/{game_id}" width="300" height="400"></iframe>'
     new_widget = Widget(campaign_id=campaign_id, embed_code=embed_code)
     db.session.add(new_widget)
     db.session.commit()
     return jsonify({'embed_code': embed_code})
 
-@bp.route('/widget/<int:campaign_id>')
-def widget(campaign_id):
+@bp.route('/widget/<int:campaign_id>/<int:game_id>')
+def widget(campaign_id, game_id):
     campaign = Campaign.query.get_or_404(campaign_id)
+    game = Game.query.get_or_404(game_id)
     coupons = Coupon.query.filter_by(campaign_id=campaign_id).all()
-    return render_template('widget.html', campaign=campaign, coupons=coupons)
+    return render_template('widget.html', campaign=campaign, game=game, coupons=coupons)
 
-@bp.route('/game/<int:campaign_id>', methods=['GET', 'POST'])
-def game(campaign_id):
+@bp.route('/game/<int:campaign_id>/<int:game_id>', methods=['GET', 'POST'])
+def game(campaign_id, game_id):
+    # check if campaign has access to this game
+    campaign_game = CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first()
+    if not campaign_game:
+        return jsonify({'message': 'Campaign does not have access to this game.'})
+
+    game = Game.query.get_or_404(game_id)
+    if game.name == 'Sum Game':
+        return sum_game(campaign_id)
+    elif game.name == 'Multiply Game':
+        return multiply_game(campaign_id)
+    else:
+        return jsonify({'message': 'Game not found.'})
+
+def sum_game(campaign_id):
     if request.method == 'POST':
         num1 = int(request.form['num1'])
         num2 = int(request.form['num2'])
@@ -34,7 +49,22 @@ def game(campaign_id):
     else:
         num1 = random.randint(1, 10)
         num2 = random.randint(1, 10)
-        return render_template('game.html', num1=num1, num2=num2, campaign_id=campaign_id)
+        return render_template('sum_game.html', num1=num1, num2=num2, campaign_id=campaign_id)
+
+def multiply_game(campaign_id):
+    if request.method == 'POST':
+        num1 = int(request.form['num1'])
+        num2 = int(request.form['num2'])
+        answer = int(request.form['answer'])
+        if answer == num1 * num2:
+            result = handle_coupon_generation(campaign_id)
+            return jsonify(result)
+        else:
+            return jsonify({'message': 'Incorrect answer. Please try again.'})
+    else:
+        num1 = random.randint(1, 10)
+        num2 = random.randint(1, 10)
+        return render_template('multiply_game.html', num1=num1, num2=num2, campaign_id=campaign_id)
 
 def handle_coupon_generation(campaign_id):
     # Try to generate a public coupon first
@@ -90,6 +120,5 @@ def validate_realtime_coupon(webservice_url, coupon_code):
     response = requests.get(webservice_url, params=params)
     #return response.status_code == 200 and response.json().get("valid", False)
     return True
-
 def generate_coupon_code():
     return ''.join(random.choices('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', k=10))
