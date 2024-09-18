@@ -30,6 +30,14 @@
                 {% endfor %}
                 <button type="submit">Select Games</button>
             </form>
+            <h3>Manage Webservice URL</h3>
+            <form method="POST" action="/update_webservice_url/{{ campaign.id }}">
+                <input type="text" name="webservice_url" value="{{ campaign.webservice_url }}" placeholder="Webservice URL">
+                <button type="submit">Update URL</button>
+            </form>
+            <form method="POST" action="/delete_webservice_url/{{ campaign.id }}">
+                <button type="submit">Delete URL</button>
+            </form>
             <h3>Public Coupons</h3>
             <ul>
                 {% for coupon in campaign.public_coupons %}

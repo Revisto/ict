@@ -9,7 +9,8 @@ def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     user_id = session['user_id']
-    campaigns = Campaign.query.filter_by(user_id=user_id).all()
+    # sort by latest campaign first
+    campaigns = Campaign.query.filter_by(user_id=user_id).order_by(Campaign.created_at.desc()).all()
     games = Game.query.all()
     for campaign in campaigns:
         campaign.total_coupons = Coupon.query.filter_by(campaign_id=campaign.id).count()
@@ -75,7 +76,7 @@ def select_games(campaign_id):
         if CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first():
             continue
         game = Game.query.get(game_id)
-        embed_code = f'<iframe src="/widget/{campaign_id}/{game_id}" width="300" height="400"></iframe>'
+        embed_code = f'<script src="/static/js/widget.js" data-campaign-id="{campaign_id}" data-game-id="{game_id}"></script>'
         new_campaign_game = CampaignGame(campaign_id=campaign_id, game_id=game_id, embed_code=embed_code)
         db.session.add(new_campaign_game)
     db.session.commit()

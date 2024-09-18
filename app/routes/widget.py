@@ -8,18 +8,25 @@ bp = Blueprint('widget', __name__)
 
 @bp.route('/generate_widget/<int:campaign_id>/<int:game_id>')
 def generate_widget(campaign_id, game_id):
-    embed_code = f'<iframe src="/widget/{campaign_id}/{game_id}" width="300" height="400"></iframe>'
+    embed_code = f'<script src="/static/js/widget.js" data-campaign-id="{campaign_id}" data-game-id="{game_id}"></script>'
     new_widget = Widget(campaign_id=campaign_id, embed_code=embed_code)
     db.session.add(new_widget)
     db.session.commit()
     return jsonify({'embed_code': embed_code})
 
-@bp.route('/widget/<int:campaign_id>/<int:game_id>')
-def widget(campaign_id, game_id):
-    campaign = Campaign.query.get_or_404(campaign_id)
+@bp.route('/popup/<int:campaign_id>/<int:game_id>', methods=['GET', 'POST'])
+def popup(campaign_id, game_id):
+    campaign_game = CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first()
+    if not campaign_game:
+        return jsonify({'message': 'Campaign does not have access to this game.'})
+
     game = Game.query.get_or_404(game_id)
-    coupons = Coupon.query.filter_by(campaign_id=campaign_id).all()
-    return render_template('widget.html', campaign=campaign, game=game, coupons=coupons)
+    if game.name == 'Sum Game':
+        return sum_game(campaign_id)
+    elif game.name == 'Multiply Game':
+        return multiply_game(campaign_id)
+    else:
+        return jsonify({'message': 'Game not found.'})
 
 @bp.route('/game/<int:campaign_id>/<int:game_id>', methods=['GET', 'POST'])
 def game(campaign_id, game_id):
