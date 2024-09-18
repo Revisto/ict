@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game</title>
+</head>
+<body>
+    <h1>Sum Game</h1>
+    <form method="POST">
+        <p>What is {{ num1 }} + {{ num2 }}?</p>
+        <input type="hidden" name="num1" value="{{ num1 }}">
+        <input type="hidden" name="num2" value="{{ num2 }}">
+        <input type="number" name="answer" required>
+        <button type="submit">Submit</button>
+    </form>
+</body>
+</html>

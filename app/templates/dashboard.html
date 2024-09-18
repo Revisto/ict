@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Dashboard</h1>
+    <form method="POST" action="/create_campaign">
+        <input type="text" name="name" placeholder="Campaign Name" required>
+        <button type="submit">Create Campaign</button>
+    </form>
+    <h2>Your Campaigns</h2>
+    <ul>
+        {% for campaign in campaigns %}
+        <li>
+            {{ campaign.name }} - Total Coupons: {{ campaign.total_coupons }}, Used: {{ campaign.used_coupons }}, Remaining: {{ campaign.remaining_coupons }}
+            <form method="POST" action="/upload_coupons/{{ campaign.id }}">
+                <input type="text" name="codes" placeholder="Comma-separated coupon codes" required>
+                <select name="type">
+                    <option value="public">Public</option>
+                    <option value="onetime">Onetime</option>
+                </select>
+                <input type="number" name="usage_limit" placeholder="Usage Limit (for public coupons)">
+                <button type="submit">Upload Coupons</button>
+            </form>
+            <button onclick="generateWidget({{ campaign.id }})">Generate Widget</button>
+            <a href="/game/{{ campaign.id }}">Play Game</a>
+            <h3>Public Coupons</h3>
+            <ul>
+                {% for coupon in campaign.public_coupons %}
+                <li>{{ coupon.code }} - Used: {{ coupon.usage_count }}/{{ coupon.usage_limit }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Onetime Coupons</h3>
+            <ul>
+                {% for coupon in campaign.onetime_coupons %}
+                <li>{{ coupon.code }} - Used: {{ 'Yes' if coupon.used else 'No' }}</li>
+                {% endfor %}
+            </ul>
+            <h3>Manage Webservice URL</h3>
+            <form method="POST" action="/update_webservice_url/{{ campaign.id }}">
+                <input type="text" name="webservice_url" value="{{ campaign.webservice_url }}" placeholder="Webservice URL">
+                <button type="submit">Update URL</button>
+            </form>
+            <form method="POST" action="/delete_webservice_url/{{ campaign.id }}">
+                <button type="submit">Delete URL</button>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+    <script>
+        function generateWidget(campaignId) {
+            fetch(`/generate_widget/${campaignId}`)
+                .then(response => response.json())
+                .then(data => alert(`Embed Code: ${data.embed_code}`));
+        }
+    </script>
+</body>
+</html>
