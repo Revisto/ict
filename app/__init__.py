@@ -19,6 +19,6 @@ def create_app():
     app.register_blueprint(widget.bp, name='widget')
     app.register_blueprint(game.bp, name='game')
 
-    #register_admin_views(app)
+    register_admin_views(app)
 
     return app

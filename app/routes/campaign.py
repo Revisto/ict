@@ -1,6 +1,7 @@
 # app/routes/campaign.py
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from app.models import Campaign, Coupon, Game, CampaignGame
+from app.decorators import login_required
 from app import db
 
 bp = Blueprint('campaign', __name__)
@@ -25,13 +26,21 @@ def dashboard():
         campaign.games = campaign_campaign_games
     return render_template('dashboard.html', campaigns=campaigns, games=games)
 
+
+@bp.route('/user_dashboard')
+@login_required
+def user_dashboard():
+    campaigns = Campaign.query.all()
+    return render_template('user_dashboard.html', campaigns=campaigns)
+
 @bp.route('/create_campaign', methods=['POST'])
 def create_campaign():
     if 'user_id' not in session:
         return redirect(url_for('auth.login'))
     name = request.form['name']
     user_id = session['user_id']
-    new_campaign = Campaign(name=name, user_id=user_id)
+    campaign_type = request.form['campaign_type']
+    new_campaign = Campaign(name=name, user_id=user_id, campaign_type=campaign_type)
     db.session.add(new_campaign)
     db.session.commit()
     return redirect(url_for('campaign.dashboard'))

@@ -1,7 +1,8 @@
 # app/routes/game.py
-from flask import Blueprint, jsonify, request, session, redirect, url_for
+from flask import Blueprint, jsonify, session, redirect, url_for
 from app.models import Campaign, Game, CampaignGame
 from app.services.game_service import get_game_template
+from app.decorators import login_required
 
 bp = Blueprint('game', __name__)
 
@@ -14,8 +15,18 @@ def popup(campaign_id, game_id):
     game = Game.query.get_or_404(game_id)
     campaign = Campaign.query.get_or_404(campaign_id)
 
+    if campaign.campaign_type == 'score' and 'user_id' not in session:
+        return redirect(url_for('auth.login'))
+
     game_template = get_game_template(game.name, campaign_id)
     if game_template:
         return game_template
     else:
         return jsonify({'message': 'Game not found.'})
+
+@bp.route('/game-test', methods=['GET'])
+def game_test():
+    #return html code <script src="/static/js/widget.js" data-campaign-id="2" data-game-id="1"></script>
+    return '''
+        <script src="/static/js/widget.js" data-campaign-id="2" data-game-id="1"></script>
+    '''

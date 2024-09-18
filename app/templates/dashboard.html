@@ -8,6 +8,10 @@
     <h1>Dashboard</h1>
     <form method="POST" action="/create_campaign">
         <input type="text" name="name" placeholder="Campaign Name" required>
+        <select name="campaign_type">
+            <option value="coupon">Coupon</option>
+            <option value="score">Score</option>
+        </select>
         <button type="submit">Create Campaign</button>
     </form>
     <h2>Your Campaigns</h2>
@@ -15,7 +19,6 @@
         {% for campaign in campaigns %}
         <li>
             <h2>{{ campaign.name }}</h2>
-
             {{ campaign.name }} - Total Coupons: {{ campaign.total_coupons }}, Used: {{ campaign.used_coupons }}, Remaining: {{ campaign.remaining_coupons }}
             <form method="POST" action="/upload_coupons/{{ campaign.id }}">
                 <input type="text" name="codes" placeholder="Comma-separated coupon codes" required>

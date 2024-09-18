@@ -6,6 +6,9 @@
 </head>
 <body>
     <h1>Multiply Game</h1>
+    {% if campaign.campaign_type == 'score' %}
+        <p>Score: {{ user.score }}</p>
+    {% endif %}
     <form method="POST">
         <p>What is {{ num1 }} * {{ num2 }}?</p>
         <input type="hidden" name="num1" value="{{ num1 }}">

@@ -1,23 +1,26 @@
 # app/services/game_service.py
-from flask import render_template, request, jsonify
+from flask import render_template, request, jsonify, session
+from app.services.reward_service import handle_game_reward
 import random
-from app.models import CampaignGame, Game
-from app.services.coupon_service import handle_coupon_generation
+from ..models import Campaign, User
 
 def sum_game(campaign_id):
+    print(session.get('user_id'))
     if request.method == 'POST':
         num1 = int(request.form['num1'])
         num2 = int(request.form['num2'])
         answer = int(request.form['answer'])
         if answer == num1 + num2:
-            result = handle_coupon_generation(campaign_id)
+            result = handle_game_reward(campaign_id, "Sum Game", session.get('user_id'))
             return jsonify(result)
         else:
             return jsonify({'message': 'Incorrect answer. Please try again.'})
     else:
         num1 = random.randint(1, 10)
         num2 = random.randint(1, 10)
-        return render_template('games/sum_game.html', num1=num1, num2=num2, campaign_id=campaign_id)
+        campaign = Campaign.query.get(campaign_id)
+        user = User.query.get(session.get('user_id')) if session.get('user_id') else None
+        return render_template('games/sum_game.html', num1=num1, num2=num2, campaign=campaign, user=user)
 
 def multiply_game(campaign_id):
     if request.method == 'POST':
@@ -25,7 +28,7 @@ def multiply_game(campaign_id):
         num2 = int(request.form['num2'])
         answer = int(request.form['answer'])
         if answer == num1 * num2:
-            result = handle_coupon_generation(campaign_id)
+            result = handle_game_reward(campaign_id, 'Multiply Game', session.get('user_id'))
             return jsonify(result)
         else:
             return jsonify({'message': 'Incorrect answer. Please try again.'})

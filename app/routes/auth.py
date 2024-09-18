@@ -11,7 +11,8 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = generate_password_hash(request.form['password'], method='pbkdf2:sha256')
-        new_user = User(username=username, password=password)
+        is_company = 'is_company' in request.form
+        new_user = User(username=username, password=password, is_company=is_company)
         db.session.add(new_user)
         db.session.commit()
         return redirect(url_for('auth.login'))
@@ -24,6 +25,11 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
+            print(user)
             session['user_id'] = user.id
-            return redirect(url_for('campaign.dashboard'))
+            session['is_company'] = user.is_company
+            if user.is_company:
+                return redirect(url_for('campaign.dashboard'))
+            else:
+                return redirect(url_for('campaign.user_dashboard'))
     return render_template('login.html')
