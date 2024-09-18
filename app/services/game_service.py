@@ -12,17 +12,17 @@ def sum_game(campaign_id):
         num2 = int(request.form['num2'])
         answer = int(request.form['answer'])
         if answer == num1 + num2:
-            result = handle_game_reward(campaign_id, game, session.get('user_id'))
-            log_game_event(campaign_id, game.id, session.get('user_id'), 'correct_answer', {'num1': num1, 'num2': num2, 'answer': answer})
+            result = handle_game_reward(campaign_id, game, session.get('company_id'))
+            log_game_event(campaign_id, game.id, session.get('company_id'), 'correct_answer', {'num1': num1, 'num2': num2, 'answer': answer})
             return jsonify(result)
         else:
-            log_game_event(campaign_id, game.id, session.get('user_id'), 'wrong_answer', {'num1': num1, 'num2': num2, 'answer': answer})
+            log_game_event(campaign_id, game.id, session.get('company_id'), 'wrong_answer', {'num1': num1, 'num2': num2, 'answer': answer})
             return jsonify({'message': 'Incorrect answer. Please try again.'})
     else:
         num1 = random.randint(1, 10)
         num2 = random.randint(1, 10)
         campaign = Campaign.query.get(campaign_id)
-        user_score = UserCampaignScore.query.filter_by(user_id=session.get('user_id'), campaign_id=campaign_id).first()
+        user_score = UserCampaignScore.query.filter_by(company_id=session.get('company_id'), campaign_id=campaign_id).first()
         return render_template('games/sum_game.html', num1=num1, num2=num2, campaign=campaign, user_score=user_score)
 
 def multiply_game(campaign_id):
@@ -32,11 +32,11 @@ def multiply_game(campaign_id):
         num2 = int(request.form['num2'])
         answer = int(request.form['answer'])
         if answer == num1 * num2:
-            result = handle_game_reward(campaign_id, game, session.get('user_id'))
-            log_game_event(campaign_id, game.id, session.get('user_id'), 'correct_answer', {'num1': num1, 'num2': num2, 'answer': answer})
+            result = handle_game_reward(campaign_id, game, session.get('company_id'))
+            log_game_event(campaign_id, game.id, session.get('company_id'), 'correct_answer', {'num1': num1, 'num2': num2, 'answer': answer})
             return jsonify(result)
         else:
-            log_game_event(campaign_id, game.id, session.get('user_id'), 'wrong_answer', {'num1': num1, 'num2': num2, 'answer': answer})
+            log_game_event(campaign_id, game.id, session.get('company_id'), 'wrong_answer', {'num1': num1, 'num2': num2, 'answer': answer})
             return jsonify({'message': 'Incorrect answer. Please try again.'})
     else:
         num1 = random.randint(1, 10)

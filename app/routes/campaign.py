@@ -2,28 +2,26 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models import Campaign, Coupon, Game, CampaignGame, UserCampaignScore
 from app.services.analytics_service import log_general_event
-from app.decorators import login_required
+from app.decorators import company_required
 from app import db
 
 bp = Blueprint('campaign', __name__)
 
 @bp.route('/create_campaign', methods=['POST'])
+@company_required
 def create_campaign():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
     name = request.form['name']
-    user_id = session['user_id']
+    company_id = session['company_id']
     campaign_type = request.form['campaign_type']
-    new_campaign = Campaign(name=name, user_id=user_id, campaign_type=campaign_type)
+    new_campaign = Campaign(name=name, company_id=company_id, campaign_type=campaign_type)
     db.session.add(new_campaign)
     db.session.commit()
-    log_general_event(new_campaign.id, user_id, 'campaign_created', {'name': name, 'campaign_type': campaign_type})
+    log_general_event(new_campaign.id, company_id, 'campaign_created', {'name': name, 'campaign_type': campaign_type})
     return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/upload_coupons/<int:campaign_id>', methods=['POST'])
+@company_required
 def upload_coupons(campaign_id):
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
     codes = request.form['codes'].split(',')
     coupon_type = request.form['type']
     usage_limit = request.form.get('usage_limit', type=int)
@@ -33,13 +31,12 @@ def upload_coupons(campaign_id):
         new_coupon = Coupon(campaign_id=campaign_id, code=code.strip(), type=coupon_type, usage_limit=usage_limit)
         db.session.add(new_coupon)
     db.session.commit()
-    log_general_event(campaign_id, session['user_id'], 'coupons_uploaded', {'count': len(codes), 'coupon_type': coupon_type})
+    log_general_event(campaign_id, session['company_id'], 'coupons_uploaded', {'count': len(codes), 'coupon_type': coupon_type})
     return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/update_webservice_url/<int:campaign_id>', methods=['POST'])
+@company_required
 def update_webservice_url(campaign_id):
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
     webservice_url = request.form['webservice_url']
     campaign = Campaign.query.get_or_404(campaign_id)
     campaign.webservice_url = webservice_url
@@ -47,18 +44,16 @@ def update_webservice_url(campaign_id):
     return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/delete_webservice_url/<int:campaign_id>', methods=['POST'])
+@company_required
 def delete_webservice_url(campaign_id):
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
     campaign = Campaign.query.get_or_404(campaign_id)
     campaign.webservice_url = None
     db.session.commit()
     return redirect(url_for('dashboard.dashboard'))
 
 @bp.route('/select_games/<int:campaign_id>', methods=['POST'])
+@company_required
 def select_games(campaign_id):
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
     game_ids = request.form.getlist('game_ids')
     for game_id in game_ids:
         if CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first():

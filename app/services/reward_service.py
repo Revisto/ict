@@ -4,7 +4,7 @@ from app.models import User, Campaign, UserCampaignScore, Game
 from app.services.coupon_service import handle_coupon_generation
 from app import db
 
-def handle_game_reward(campaign_id, game, user_id=None):
+def handle_game_reward(campaign_id, game, user):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
         return {'message': 'Campaign not found'}
@@ -12,21 +12,17 @@ def handle_game_reward(campaign_id, game, user_id=None):
     if campaign.campaign_type == 'coupon':
         return handle_coupon_generation(campaign_id)
 
-    elif campaign.campaign_type == 'score' and user_id:
-        user = User.query.get(user_id)
-        user_score = UserCampaignScore.query.filter_by(user_id=user_id, campaign_id=campaign_id).first()
+    elif campaign.campaign_type == 'score':
+        if not user.telephone:
+            return {'message': 'User not authenticated'}
+
+        user_score = UserCampaignScore.query.filter_by(user_id=user.id, campaign_id=campaign_id).first()
         if not user_score:
-            user_score = UserCampaignScore(user_id=user_id, campaign_id=campaign_id, score=0)
+            user_score = UserCampaignScore(user_id=user.id, campaign_id=campaign_id, score=0)
             db.session.add(user_score)
-
-        if not user:
-            return {'message': 'User not found'}
-
-        if not game:
-            return {'message': 'Game not found'}
 
         user_score.score += game.score_increment
         db.session.commit()
         return {'message': 'Score updated', 'score': user_score.score}
     
-    return {'message': 'Invalid campaign type or user not logged in'}
+    return {'message': 'Invalid campaign type'}

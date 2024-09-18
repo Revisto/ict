@@ -1,19 +1,26 @@
 # app/models.py
+import uuid
 from datetime import datetime
 from .extensions import db
 
-class User(db.Model):
+class Company(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(200), nullable=False)
-    is_company = db.Column(db.Boolean, default=False)
+    campaigns = db.relationship('Campaign', backref='company', lazy=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class User(db.Model):
+    id = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    telephone = db.Column(db.String(20), nullable=True, unique=True)
+    password = db.Column(db.String(200), nullable=True)
     scores = db.relationship('UserCampaignScore', backref='user', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
     campaign_type = db.Column(db.String(20), nullable=False)
     webservice_url = db.Column(db.String(200), nullable=True)
     scores = db.relationship('UserCampaignScore', backref='campaign', lazy=True)
@@ -80,7 +87,7 @@ class GameAnalytics(db.Model):
 class GeneralAnalytics(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)
     event_type = db.Column(db.String(50), nullable=False)  # e.g., 'coupon_given', 'game_attempt'
     event_data = db.Column(db.JSON, nullable=True)  # Additional data specific to the event
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -89,7 +96,7 @@ class GeneralAnalytics(db.Model):
         return {
             'id': self.id,
             'campaign_id': self.campaign_id,
-            'user_id': self.user_id,
+            'company_id': self.company_id,
             'event_type': self.event_type,
             'event_data': self.event_data,
             'created_at': self.created_at.isoformat()

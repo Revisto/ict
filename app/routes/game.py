@@ -2,12 +2,13 @@
 from flask import Blueprint, jsonify, session, redirect, url_for
 from app.models import Campaign, Game, CampaignGame
 from app.services.game_service import get_game_template
-from app.decorators import login_required
+from app.decorators import validate_uuid
 
 bp = Blueprint('game', __name__)
 
 @bp.route('/popup/<int:campaign_id>/<int:game_id>', methods=['GET', 'POST'])
-def popup(campaign_id, game_id):
+@validate_uuid
+def popup(user, campaign_id, game_id):
     campaign_game = CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first()
     if not campaign_game:
         return jsonify({'message': 'Campaign does not have access to this game.'})
@@ -15,8 +16,8 @@ def popup(campaign_id, game_id):
     game = Game.query.get_or_404(game_id)
     campaign = Campaign.query.get_or_404(campaign_id)
 
-    if campaign.campaign_type == 'score' and 'user_id' not in session:
-        return redirect(url_for('auth.login'))
+    if campaign.campaign_type == 'score' and not user.telephone:
+        return redirect(url_for('auth.authenticate'))
 
     game_template = get_game_template(game.name, campaign_id)
     if game_template:
