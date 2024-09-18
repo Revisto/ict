@@ -26,7 +26,6 @@ def popup(campaign_id, game_id):
 
 @bp.route('/game-test', methods=['GET'])
 def game_test():
-    #return html code <script src="/static/js/widget.js" data-campaign-id="2" data-game-id="1"></script>
     return '''
-        <script src="/static/js/widget.js" data-campaign-id="2" data-game-id="1"></script>
+        <script src="/static/js/widget.js" data-campaign-id="6" data-game-id="1"></script>
     '''

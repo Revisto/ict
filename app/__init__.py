@@ -3,6 +3,7 @@ from flask import Flask
 from flask_migrate import Migrate
 from app.extensions import db
 from app.admin import register_admin_views
+from app.services.game_sync_service import sync_games_with_db
 
 migrate = Migrate()
 
@@ -20,5 +21,8 @@ def create_app():
     app.register_blueprint(game.bp, name='game')
 
     register_admin_views(app)
+
+    with app.app_context():
+        sync_games_with_db()
 
     return app

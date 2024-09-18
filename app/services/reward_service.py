@@ -1,16 +1,10 @@
 # app/services/reward_service.py
 import json
-from app.models import User, Campaign
+from app.models import User, Campaign, UserCampaignScore, Game
 from app.services.coupon_service import handle_coupon_generation
 from app import db
 
-def load_game_rewards():
-    with open('app/config/game_rewards.json') as f:
-        return json.load(f)
-
-game_rewards = load_game_rewards()
-
-def handle_game_reward(campaign_id, game_name, user_id=None):
+def handle_game_reward(campaign_id, game, user_id=None):
     campaign = Campaign.query.get(campaign_id)
     if not campaign:
         return {'message': 'Campaign not found'}
@@ -20,12 +14,19 @@ def handle_game_reward(campaign_id, game_name, user_id=None):
 
     elif campaign.campaign_type == 'score' and user_id:
         user = User.query.get(user_id)
+        user_score = UserCampaignScore.query.filter_by(user_id=user_id, campaign_id=campaign_id).first()
+        if not user_score:
+            user_score = UserCampaignScore(user_id=user_id, campaign_id=campaign_id, score=0)
+            db.session.add(user_score)
+
         if not user:
             return {'message': 'User not found'}
 
-        score_increment = game_rewards.get(game_name, {}).get('score_increment', 10)
-        user.score += score_increment
+        if not game:
+            return {'message': 'Game not found'}
+
+        user_score.score += game.score_increment
         db.session.commit()
-        return {'message': 'Score updated', 'score': user.score}
+        return {'message': 'Score updated', 'score': user_score.score}
     
     return {'message': 'Invalid campaign type or user not logged in'}

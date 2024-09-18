@@ -15,8 +15,8 @@ class SecureModelView(ModelView):
         return True
 
 class UserAdmin(SecureModelView):
-    column_list = ('id', 'username', 'is_company', 'score', 'created_at')
-    form_columns = ('username', 'password', 'is_company', 'score')
+    column_list = ('id', 'username', 'is_company', 'scores', 'created_at')
+    form_columns = ('username', 'password', 'is_company', 'scores')
 
 class CampaignAdmin(SecureModelView):
     column_list = ('id', 'name', 'user_id', 'campaign_type', 'created_at')

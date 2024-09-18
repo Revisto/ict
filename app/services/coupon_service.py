@@ -24,9 +24,14 @@ def handle_coupon_generation(campaign_id):
 def generate_public_coupon(campaign_id):
     coupon = Coupon.query.filter_by(campaign_id=campaign_id, type='public', used=False).first()
     if coupon:
-        coupon.used = True
-        db.session.commit()
-        return {'coupon_code': coupon.code}
+        if coupon.usage_limit is None or coupon.usage_count < coupon.usage_limit:
+            coupon.usage_count += 1
+            if coupon.usage_limit is not None and coupon.usage_count >= coupon.usage_limit:
+                coupon.used = True
+            db.session.commit()
+            return {'coupon_code': coupon.code}
+        else:
+            return None
     return None
 
 def generate_onetime_coupon(campaign_id):

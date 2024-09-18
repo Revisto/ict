@@ -4,24 +4,32 @@ from .extensions import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(100), nullable=False, unique=True)
+    username = db.Column(db.String(100), nullable=False)
     password = db.Column(db.String(200), nullable=False)
     is_company = db.Column(db.Boolean, default=False)
-    score = db.Column(db.Integer, default=0)  # Only for users
+    scores = db.relationship('UserCampaignScore', backref='user', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    campaign_type = db.Column(db.String(20), nullable=False)  # 'coupon' or 'score'
+    campaign_type = db.Column(db.String(20), nullable=False)
     webservice_url = db.Column(db.String(200), nullable=True)
+    scores = db.relationship('UserCampaignScore', backref='campaign', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class UserCampaignScore(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    campaign_id = db.Column(db.Integer, db.ForeignKey('campaign.id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False, default=0)
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=True)
+    score_increment = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Coupon(db.Model):

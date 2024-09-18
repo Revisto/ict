@@ -1,0 +1,16 @@
+{
+    "games": [
+        {
+            "id": 1,
+            "name": "Sum Game",
+            "description": "A game where you sum numbers.",
+            "score_increment": 10
+        },
+        {
+            "id": 2,
+            "name": "Multiply Game",
+            "description": "A game where you multiply numbers.",
+            "score_increment": 15
+        }
+    ]
+}
