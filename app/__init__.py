@@ -14,11 +14,12 @@ def create_app():
     db.init_app(app)
     migrate.init_app(app, db)
 
-    from .routes import auth, campaign, widget, game
+    from .routes import auth, campaign, widget, game, dashboard
     app.register_blueprint(auth.bp, name='auth')
     app.register_blueprint(campaign.bp, name='campaign')
     app.register_blueprint(widget.bp, name='widget')
     app.register_blueprint(game.bp, name='game')
+    app.register_blueprint(dashboard.bp, name='dashboard')
 
     register_admin_views(app)
 

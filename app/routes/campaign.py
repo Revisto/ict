@@ -1,40 +1,10 @@
 # app/routes/campaign.py
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from app.models import Campaign, Coupon, Game, CampaignGame, UserCampaignScore
 from app.decorators import login_required
 from app import db
 
 bp = Blueprint('campaign', __name__)
-
-@bp.route('/dashboard')
-def dashboard():
-    if 'user_id' not in session:
-        return redirect(url_for('auth.login'))
-    user_id = session['user_id']
-    campaigns = Campaign.query.filter_by(user_id=user_id).order_by(Campaign.created_at.desc()).all()
-    games = Game.query.all()
-    for campaign in campaigns:
-        campaign.total_coupons = Coupon.query.filter_by(campaign_id=campaign.id).count()
-        campaign.used_coupons = Coupon.query.filter_by(campaign_id=campaign.id, used=True).count()
-        campaign.remaining_coupons = campaign.total_coupons - campaign.used_coupons
-        campaign.public_coupons = Coupon.query.filter_by(campaign_id=campaign.id, type='public').all()
-        campaign.onetime_coupons = Coupon.query.filter_by(campaign_id=campaign.id, type='onetime').all()
-        campaign_campaign_games = CampaignGame.query.filter_by(campaign_id=campaign.id).all()
-        for campaign_game in campaign_campaign_games:
-            campaign_game.game = Game.query.get(campaign_game.game_id)
-        campaign.games = campaign_campaign_games
-        campaign.user_score = UserCampaignScore.query.filter_by(user_id=user_id, campaign_id=campaign.id).first()
-    return render_template('dashboard.html', campaigns=campaigns, games=games)
-
-
-@bp.route('/user_dashboard')
-@login_required
-def user_dashboard():
-    user_id = session['user_id']
-    campaigns = Campaign.query.all()
-    for campaign in campaigns:
-        campaign.user_score = UserCampaignScore.query.filter_by(user_id=user_id, campaign_id=campaign.id).first()
-    return render_template('user_dashboard.html', campaigns=campaigns)
 
 @bp.route('/create_campaign', methods=['POST'])
 def create_campaign():
@@ -96,3 +66,18 @@ def select_games(campaign_id):
         db.session.add(new_campaign_game)
     db.session.commit()
     return redirect(url_for('campaign.dashboard'))
+
+@bp.route('/campaigns', methods=['GET'])
+def list_campaigns():
+    campaigns = Campaign.query.filter_by(campaign_type='score').all()
+    return render_template('campaigns.html', campaigns=campaigns)
+
+@bp.route('/leaderboard/<int:campaign_id>', methods=['GET'])
+def leaderboard(campaign_id):
+    campaign = Campaign.query.get_or_404(campaign_id)
+    if campaign.campaign_type != 'score':
+        return jsonify({'message': 'Invalid campaign type.'}), 400
+    
+    # Query the leaderboard for the selected campaign
+    leaderboard = UserCampaignScore.query.filter_by(campaign_id=campaign_id).order_by(UserCampaignScore.score.desc()).all()
+    return render_template('leaderboard.html', campaign=campaign, leaderboard=leaderboard)
