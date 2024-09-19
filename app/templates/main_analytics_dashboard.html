@@ -23,6 +23,11 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ campaign.id }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ campaign.name }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ campaign.campaign_type }}</td>
+                            <td>
+                                {% for campaign_game in campaign_games[campaign.id] %}
+                                    <a href="{{ url_for('analytics.analytics_dashboard', campaign_id=campaign.id, game_id=campaign_game.game_id) }}">View {{ campaign_game.game.name }} Analytics</a><br>
+                                {% endfor %}
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
