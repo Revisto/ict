@@ -26,3 +26,7 @@ def dashboard():
             campaign_game.game = Game.query.get(campaign_game.game_id)
         campaign.games = campaign_campaign_games
     return render_template('dashboard.html', campaigns=campaigns, games=games)
+
+@bp.route('/')
+def land():
+    return render_template('home.html')

@@ -1,0 +1,96 @@
+<!-- templates/header.html -->
+<nav class="bg-white shadow">
+    <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between">
+            <!-- Mobile menu button-->
+            <div class="absolute inset-y-0 right-0 flex items-center sm:hidden">
+                <button type="button" class="inline-flex items-center justify-center rounded-md p-2 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">باز کردن منوی اصلی</span>
+                    <!-- Icon when menu is closed. -->
+                    <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                    </svg>
+                    <!-- Icon when menu is open. -->
+                    <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                <!-- Site Title -->
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="/" class="text-xl font-bold text-gray-900">تولید کننده کمپین</a>
+                </div>
+                <div class="hidden sm:ml-6 sm:block">
+                    <div class="flex space-x-4">
+                        {% if session.get('company_id') %}
+                            <!-- لینک‌های نمایش داده شده وقتی کاربر وارد شده است -->
+                            <a href="/" class="rounded-md px-3 py-2 text-sm font-medium text-indigo-600 bg-gray-100" aria-current="page">خانه</a>
+                            <a href="/dashboard" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">داشبورد</a>
+                            <a href="/analytics" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">تجزیه و تحلیل</a>
+                            <a href="/campaigns" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">کمپین‌ها</a>
+                        {% else %}
+                            <!-- لینک‌های نمایش داده شده وقتی کاربر وارد نشده است -->
+                            <a href="/" class="rounded-md px-3 py-2 text-sm font-medium text-indigo-600 bg-gray-100" aria-current="page">خانه</a>
+                            <a href="/register" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">ثبت‌نام</a>
+                            <a href="/login" class="rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">ورود</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="absolute inset-y-0 left-0 flex items-center pl-2 sm:static sm:inset-auto sm:ml-6 sm:pl-0">
+                <!-- Removed Profile Dropdown Section -->
+                <!-- If you want to add other elements like notifications, you can do so here -->
+                <!-- Example: Notification Button (optional) -->
+                <!--
+                <button type="button" class="relative rounded-full bg-white p-1 text-gray-700 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-white">
+                    <span class="sr-only">مشاهده اعلان‌ها</span>
+                    <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="..."/> Your SVG Path
+                    </svg>
+                </button>
+                -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile menu, show/hide based on menu state. -->
+    <div class="sm:hidden hidden" id="mobile-menu">
+        <div class="space-y-1 px-2 pb-3 pt-2">
+            {% if session.get('company_id') %}
+                <!-- لینک‌های نمایش داده شده وقتی کاربر وارد شده است -->
+                <a href="/" class="block rounded-md px-3 py-2 text-base font-medium text-indigo-600 bg-gray-100" aria-current="page">خانه</a>
+                <a href="/dashboard" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">داشبورد</a>
+                <a href="/analytics" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">تجزیه و تحلیل</a>
+                <a href="/campaigns" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">کمپین‌ها</a>
+            {% else %}
+                <!-- لینک‌های نمایش داده شده وقتی کاربر وارد نشده است -->
+                <a href="/" class="block rounded-md px-3 py-2 text-base font-medium text-indigo-600 bg-gray-100" aria-current="page">خانه</a>
+                <a href="/register" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">ثبت‌نام</a>
+                <a href="/login" class="block rounded-md px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900">ورود</a>
+            {% endif %}
+        </div>
+    </div>
+</nav>
+
+<!-- JavaScript for Mobile Menu Toggle -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const mobileMenuButton = document.querySelector('button[aria-controls="mobile-menu"]');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        mobileMenuButton.addEventListener('click', () => {
+            const expanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenuButton.setAttribute('aria-expanded', !expanded);
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Toggle menu icons
+        mobileMenuButton.addEventListener('click', () => {
+            const openIcon = mobileMenuButton.querySelector('svg.block');
+            const closeIcon = mobileMenuButton.querySelector('svg.hidden');
+            openIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+        });
+    });
+</script>

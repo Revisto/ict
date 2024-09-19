@@ -1,14 +1,54 @@
 <!-- templates/register.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Register</button>
-    </form>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}ثبت‌نام - Campaign Generator{% endblock %}
+
+{% block content %}
+    <div class="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        <div class="w-full max-w-md space-y-8">
+            <div>
+                <!-- لوگو -->
+                <a href="/" class="flex justify-center">
+                    <!-- اگر لوگوی تصویری دارید، از تگ <img> استفاده کنید -->
+                    <!-- <img class="h-12 w-auto" src="/static/images/logo.png" alt="Campaign Generator"> -->
+                    <!-- یا اگر لوگو متنی است: -->
+                    <span class="text-3xl font-bold text-indigo-600">Campaign Generator</span>
+                </a>
+                <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900">ثبت‌نام در Campaign Generator</h2>
+                <p class="mt-2 text-center text-sm text-gray-600">
+                    یا
+                    <a href="/login" class="font-medium text-indigo-600 hover:text-indigo-500">ورود به حساب کاربری</a>
+                </p>
+            </div>
+            <form class="mt-8 space-y-6" method="POST" action="/register">
+                <div class="-space-y-px rounded-md shadow-sm">
+                    <div>
+                        <label for="username" class="sr-only">نام کاربری</label>
+                        <input id="username" name="username" type="text" autocomplete="username" required class="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="نام کاربری">
+                    </div>
+                    <div>
+                        <label for="password" class="sr-only">رمز عبور</label>
+                        <input id="password" name="password" type="password" autocomplete="current-password" required class="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="رمز عبور">
+                    </div>
+                </div>
+
+                <!-- نمایش خطاها (در صورت وجود) -->
+                {% if errors %}
+                    <div class="text-red-600">
+                        <ul>
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                <div>
+                    <button type="submit" class="group relative flex w-full justify-center rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
+                        ثبت‌نام
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

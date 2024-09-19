@@ -1,90 +1,126 @@
 <!-- templates/dashboard.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Dashboard</title>
-</head>
-<body>
-    <h1>Dashboard</h1>
-    <form method="POST" action="/create_campaign">
-        <input type="text" name="name" placeholder="Campaign Name" required>
-        <select name="campaign_type">
-            <option value="coupon">Coupon</option>
-            <option value="score">Score</option>
-        </select>
-        <button type="submit">Create Campaign</button>
+{% extends 'base.html' %}
+
+{% block title %}داشبورد - Campaign Generator{% endblock %}
+
+{% block content %}
+<main class="container mx-auto p-4">
+    <h1 class="text-3xl font-bold mb-6">داشبورد</h1>
+    
+    <!-- Campaign Creation Form -->
+    <form method="POST" action="/create_campaign" class="mb-8">
+        <div class="flex flex-col md:flex-row md:space-x-4">
+            <input type="text" name="name" placeholder="نام کمپین" required class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+            <select name="campaign_type" class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                <option value="coupon">تخفیف</option>
+                <option value="score">امتیاز</option>
+            </select>
+            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500">ایجاد کمپین</button>
+        </div>
     </form>
-    <h2>Your Campaigns</h2>
-    <ul>
+
+    <!-- Your Campaigns Section -->
+    <h2 class="text-2xl font-semibold mb-4">کمپین‌های شما</h2>
+    <ul class="space-y-8">
         {% for campaign in campaigns %}
-        <li>
-            <h2>{{ campaign.name }}</h2>
-            {{ campaign.name }} - Total Coupons: {{ campaign.total_coupons }}, Used: {{ campaign.used_coupons }}, Remaining: {{ campaign.remaining_coupons }}
-            <form method="POST" action="/upload_coupons/{{ campaign.id }}">
-                <input type="text" name="codes" placeholder="Comma-separated coupon codes" required>
-                <select name="type">
-                    <option value="public">Public</option>
-                    <option value="onetime">Onetime</option>
-                </select>
-                <input type="number" name="usage_limit" placeholder="Usage Limit (for public coupons)">
-                <button type="submit">Upload Coupons</button>
+        <li class="bg-white p-6 rounded-md shadow">
+            <h2 class="text-xl font-bold">{{ campaign.name }}</h2>
+            <p class="text-gray-600">تعداد کل تخفیف‌ها: {{ campaign.total_coupons }}, استفاده شده: {{ campaign.used_coupons }}, باقی‌مانده: {{ campaign.remaining_coupons }}</p>
+            
+            <!-- Upload Coupons Form -->
+            <form method="POST" action="/upload_coupons/{{ campaign.id }}" class="mt-4">
+                <div class="flex flex-col md:flex-row md:space-x-4">
+                    <input type="text" name="codes" placeholder="کدهای تخفیف (با کاما جدا کنید)" required class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                    <select name="type" class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                        <option value="public">عمومی</option>
+                        <option value="onetime">یکبار مصرف</option>
+                    </select>
+                    <input type="number" name="usage_limit" placeholder="حداکثر استفاده (برای تخفیف‌های عمومی)" class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-500">بارگذاری تخفیف‌ها</button>
+                </div>
             </form>
-            <form method="POST" action="/select_games/{{ campaign.id }}">
-                <label>Select Games:</label>
-                {% for game in games %}
-                    {% if campaign.campaign_type == game.type %}
-                        <input type="checkbox" name="game_ids" value="{{ game.id }}">{{ game.name }}
-                    {% endif %}
-                {% endfor %}
-                <button type="submit">Select Games</button>
+
+            <!-- Select Games Form -->
+            <form method="POST" action="/select_games/{{ campaign.id }}" class="mt-4">
+                <label class="block text-sm font-medium text-gray-700">انتخاب بازی‌ها:</label>
+                <div class="mt-2 space-y-2">
+                    {% for game in games %}
+                        {% if campaign.campaign_type == game.type %}
+                            <div class="flex items-center">
+                                <input type="checkbox" name="game_ids" value="{{ game.id }}" class="h-4 w-4 text-indigo-600 border-gray-300 rounded">
+                                <label class="ml-2 block text-sm text-gray-700">{{ game.name }}</label>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button type="submit" class="mt-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500">انتخاب بازی‌ها</button>
             </form>
-            <h3>Manage Webservice URL</h3>
-            <form method="POST" action="/update_webservice_url/{{ campaign.id }}">
-                <input type="text" name="webservice_url" value="{{ campaign.webservice_url }}" placeholder="Webservice URL">
-                <button type="submit">Update URL</button>
-            </form>
-            <form method="POST" action="/delete_webservice_url/{{ campaign.id }}">
-                <button type="submit">Delete URL</button>
-            </form>
-            <h4>Public Coupons</h4>
-            <ul>
-                {% for coupon in campaign.public_coupons %}
-                <li>{{ coupon.code }} - Used: {{ coupon.usage_count }}/{{ coupon.usage_limit }}</li>
-                {% endfor %}
-            </ul>
-            <h4>Onetime Coupons</h4>
-            <ul>
-                {% for coupon in campaign.onetime_coupons %}
-                <li>{{ coupon.code }} - Used: {{ 'Yes' if coupon.used else 'No' }}</li>
-                {% endfor %}
-            </ul>
-            <h4>Games</h4>
-            <ul>
-                {% for campaign_game in campaign.games %}
-                <li>{{ campaign_game.game.name }} - Embed Code: {{ campaign_game.embed_code }}</li>
-                {% endfor %}
-            </ul>
-            <h3>Upload Custom Game</h3>
-            <form method="POST" action="/upload_custom_game/{{ campaign.id }}" enctype="multipart/form-data">
-                <input type="text" name="game_name" placeholder="Game Name" required>
-                <select name="game_type">
-                    <option value="score">Score</option>
-                    <option value="coupon">Coupon</option>
-                <input type="file" name="game_file" accept=".html" required>
-                <button type="submit">Upload Game</button>
-            </form>
+
+            <!-- Manage Webservice URL -->
+            <div class="mt-4">
+                <h3 class="text-lg font-medium">مدیریت URL وب‌سرویس</h3>
+                <form method="POST" action="/update_webservice_url/{{ campaign.id }}" class="mt-2 flex flex-col md:flex-row md:space-x-4">
+                    <input type="text" name="webservice_url" value="{{ campaign.webservice_url }}" placeholder="URL وب‌سرویس" class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                    <button type="submit" class="px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-500">به‌روزرسانی URL</button>
+                </form>
+                <form method="POST" action="/delete_webservice_url/{{ campaign.id }}" class="mt-2">
+                    <button type="submit" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-500">حذف URL</button>
+                </form>
+            </div>
+
+            <!-- Coupons and Games Details -->
+            <div class="mt-4">
+                <h4 class="text-md font-semibold">تخفیف‌های عمومی</h4>
+                <ul class="list-disc list-inside text-gray-600">
+                    {% for coupon in campaign.public_coupons %}
+                    <li>{{ coupon.code }} - استفاده شده: {{ coupon.usage_count }}/{{ coupon.usage_limit }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h4 class="text-md font-semibold mt-4">تخفیف‌های یکبار مصرف</h4>
+                <ul class="list-disc list-inside text-gray-600">
+                    {% for coupon in campaign.onetime_coupons %}
+                    <li>{{ coupon.code }} - استفاده شده: {{ 'بله' if coupon.used else 'خیر' }}</li>
+                    {% endfor %}
+                </ul>
+
+                <h4 class="text-md font-semibold mt-4">بازی‌ها</h4>
+                <ul class="list-disc list-inside text-gray-600">
+                    {% for campaign_game in campaign.games %}
+                    <li>{{ campaign_game.game.name }} - کد جاسازی: {{ campaign_game.embed_code }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Upload Custom Game -->
+            <div class="mt-4">
+                <h3 class="text-lg font-medium">بارگذاری بازی سفارشی</h3>
+                <form method="POST" action="/upload_custom_game/{{ campaign.id }}" enctype="multipart/form-data" class="mt-2 flex flex-col md:flex-row md:space-x-4">
+                    <input type="text" name="game_name" placeholder="نام بازی" required class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                    <select name="game_type" class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                        <option value="score">امتیاز</option>
+                        <option value="coupon">تخفیف</option>
+                    </select>
+                    <input type="file" name="game_file" accept=".html" required class="px-4 py-2 border border-gray-300 rounded-md mb-4 md:mb-0">
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-500">بارگذاری بازی</button>
+                </form>
+            </div>
         </li>
-        <hr></hr>
-        <hr></hr>
-        <hr></hr>
+        {% if not loop.last %}
+        <li class="border-t border-gray-200"></li>
+        <li class="border-t border-gray-200"></li>
+        <li class="border-t border-gray-200"></li>
+        {% endif %}
         {% endfor %}
     </ul>
+
+    <!-- Widget Generation Script -->
     <script>
         function generateWidget(campaignId, gameId) {
             fetch(`/generate_widget/${campaignId}/${gameId}`)
                 .then(response => response.json())
-                .then(data => alert(`Embed Code: ${data.embed_code}`));
+                .then(data => alert(`کد جاسازی: ${data.embed_code}`));
         }
     </script>
-</body>
-</html>
+</main>
+{% endblock %}

@@ -1,20 +1,28 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+<!-- templates/dashboard.html -->
+{% extends 'base.html' %}
+
+{% block title %}داشبورد تجزیه و تحلیل - Campaign Generator{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <h1 class="text-3xl font-bold text-gray-900">داشبورد تجزیه و تحلیل</h1>
+        <div class="mt-4">
+            <h3 class="text-xl font-semibold text-gray-700">کمپین: {{ campaign.name }}</h3>
+            <h3 class="text-xl font-semibold text-gray-700">بازی: {{ game.name }}</h3>
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-800">تجزیه و تحلیل بازی</h2>
+            <canvas id="gameAnalyticsChart" class="mt-4 w-full h-64"></canvas>
+        </div>
+
+        <div class="mt-8">
+            <h2 class="text-2xl font-bold text-gray-800">تجزیه و تحلیل عمومی</h2>
+            <canvas id="generalAnalyticsChart" class="mt-4 w-full h-64"></canvas>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <h1>Analytics Dashboard</h1>
-    <h3>Campaign: {{ campaign.name }}</h3>
-    <h3>Game: {{ game.name }}</h3>
-    <h2>Game Analytics</h2>
-    <canvas id="gameAnalyticsChart"></canvas>
-    <h2>General Analytics</h2>
-    <canvas id="generalAnalyticsChart"></canvas>
     <script>
         async function fetchAnalyticsData(url) {
             const response = await fetch(url);
@@ -39,7 +47,7 @@
                 data: {
                     labels: gameEventTypes,
                     datasets: [{
-                        label: 'Game Events',
+                        label: 'رویدادهای بازی',
                         data: gameEventCounts,
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
@@ -60,7 +68,7 @@
                 data: {
                     labels: generalEventTypes,
                     datasets: [{
-                        label: 'General Events',
+                        label: 'رویدادهای عمومی',
                         data: generalEventCounts,
                         backgroundColor: 'rgba(153, 102, 255, 0.2)',
                         borderColor: 'rgba(153, 102, 255, 1)',
@@ -79,5 +87,4 @@
 
         renderCharts();
     </script>
-</body>
-</html>
+{% endblock %}
