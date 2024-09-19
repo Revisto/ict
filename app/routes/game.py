@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request, redirect, url_for, session
 from app.models import Campaign, Game, UserCampaignScore, Coupon, CampaignGame
 from app.decorators import company_required
 from app.services.game_service import render_game_template
+from app.services.coupon_service import handle_coupon_generation
 from app.decorators import validate_uuid
 from app import db
 
@@ -34,14 +35,12 @@ def get_coupon(user, campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     if campaign.campaign_type != 'coupon':
         return jsonify({'message': 'Invalid campaign type.'}), 400
-
-    coupon = Coupon.query.filter_by(campaign_id=campaign_id, used=False).first()
+    
+    coupon = handle_coupon_generation(campaign_id)
     if not coupon:
-        return jsonify({'message': 'No available coupons.'}), 404
+        return jsonify({'message': 'No coupons available.'}), 400
 
-    coupon.used = True
-    db.session.commit()
-    return jsonify({'coupon_code': coupon.code})
+    return jsonify(coupon)
 
 @bp.route('/game/add_score/<int:campaign_id>', methods=['POST'])
 @validate_uuid
