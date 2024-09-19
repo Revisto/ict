@@ -50,6 +50,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 gameContainer.style.backgroundColor = '#fff';
                 gameContainer.style.padding = '20px';
                 gameContainer.style.zIndex = '1002';
+                // border radius
+                gameContainer.style.borderRadius = '30px';
                 document.body.appendChild(gameContainer);
 
                 fetch(`http://127.0.0.1:5000/popup/${campaignId}/${gameId}`, {
@@ -122,7 +124,7 @@ function addScore(campaignId, scoreIncrement) {
         return response.json();
     })
     .then(data => {
-        alert(`Score updated: ${data.score}`);
+        alert(`Total Score: ${data.score}`);
         // Refresh the score after successful score update
         window.location.reload();
     })
