@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Generated new user UUID:', userId);
     }
 
-    var scriptTag = document.querySelector('script[src="http://ict.revisto.lol/static/js/widget.js"]');
+    var scriptTag = document.querySelector('script[src="https://ict.revisto.lol/static/js/widget.js"]');
     
     if (scriptTag) {
         var context = scriptTag.getAttribute('data-context');
@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 gameContainer.style.borderRadius = '30px';
                 document.body.appendChild(gameContainer);
 
-                fetch(`http://ict.revisto.lol/popup/${campaignId}/${gameId}`, {
+                fetch(`https://ict.revisto.lol/popup/${campaignId}/${gameId}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('user_uuid')}`
                     }
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     } else {
-        console.error('Script tag with src "http://ict.revisto.lol/static/js/widget.js" not found.');
+        console.error('Script tag with src "https://ict.revisto.lol/static/js/widget.js" not found.');
     }
 });
 
@@ -92,7 +92,7 @@ function generateUUID() {
 }
 
 function getCoupon(campaignId) {
-    fetch(`http://ict.revisto.lol/game/get_coupon/${campaignId}`, {
+    fetch(`https://ict.revisto.lol/game/get_coupon/${campaignId}`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('user_uuid')}`
         }
@@ -109,7 +109,7 @@ function getCoupon(campaignId) {
 }
 
 function addScore(campaignId, scoreIncrement) {
-    fetch(`http://ict.revisto.lol/game/add_score/${campaignId}`, {
+    fetch(`https://ict.revisto.lol/game/add_score/${campaignId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ function addScore(campaignId, scoreIncrement) {
 }
 
 function getUserScore(campaignId) {
-    fetch(`http://ict.revisto.lol/game/get_user_score/${campaignId}`, {
+    fetch(`https://ict.revisto.lol/game/get_user_score/${campaignId}`, {
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('user_uuid')}`
         }

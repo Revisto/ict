@@ -20,7 +20,7 @@
             const password = event.target.password.value;
             const userUuid = localStorage.getItem('user_uuid');
 
-            fetch('http://ict.revisto.lol/authenticate', {
+            fetch('https://ict.revisto.lol/authenticate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
