@@ -7,7 +7,11 @@ from app import db
 def validate_uuid(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        uuid = request.headers.get('UUID')
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return jsonify({'message': 'Authorization header is required'}), 400
+        uuid = auth_header.split(' ')[1] if ' ' in auth_header else None
+        print("uuid: ", uuid)
         if not uuid:
             return jsonify({'message': 'UUID is required'}), 400
         user = User.query.get(uuid)

@@ -32,7 +32,9 @@
             <form method="POST" action="/select_games/{{ campaign.id }}">
                 <label>Select Games:</label>
                 {% for game in games %}
-                <input type="checkbox" name="game_ids" value="{{ game.id }}">{{ game.name }}
+                    {% if campaign.campaign_type == game.type %}
+                        <input type="checkbox" name="game_ids" value="{{ game.id }}">{{ game.name }}
+                    {% endif %}
                 {% endfor %}
                 <button type="submit">Select Games</button>
             </form>
@@ -62,6 +64,15 @@
                 <li>{{ campaign_game.game.name }} - Embed Code: {{ campaign_game.embed_code }}</li>
                 {% endfor %}
             </ul>
+            <h3>Upload Custom Game</h3>
+            <form method="POST" action="/upload_custom_game/{{ campaign.id }}" enctype="multipart/form-data">
+                <input type="text" name="game_name" placeholder="Game Name" required>
+                <select name="game_type">
+                    <option value="score">Score</option>
+                    <option value="coupon">Coupon</option>
+                <input type="file" name="game_file" accept=".html" required>
+                <button type="submit">Upload Game</button>
+            </form>
         </li>
         <hr></hr>
         <hr></hr>

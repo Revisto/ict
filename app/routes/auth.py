@@ -33,10 +33,12 @@ def company_login():
 @validate_uuid
 def authenticate(user):
     if request.method == 'POST':
-        telephone = request.form['telephone']
-        password = request.form['password']
+        data = request.get_json()
+        telephone = data['telephone']
+        password = data['password']
+        print(telephone, password)
         existing_user = User.query.filter_by(telephone=telephone).first()
-        
+        print(existing_user)
         if existing_user:
             # Option 1: There is already this unique telephone
             if check_password_hash(existing_user.password, password):
@@ -59,7 +61,7 @@ def authenticate(user):
                 db.session.delete(User.query.get(old_uuid))
                 db.session.commit()
                 
-                return jsonify({'uuid': existing_user.id})
+                return jsonify({'success': True, 'uuid': existing_user.id})
             else:
                 return jsonify({'message': 'Invalid credentials'}), 401
         else:
@@ -67,6 +69,6 @@ def authenticate(user):
             user.telephone = telephone
             user.password = generate_password_hash(password)
             db.session.commit()
-            return jsonify({'uuid': user.id})
+            return jsonify({'success': True, 'uuid': user.id})
     
     return render_template('authenticate.html')

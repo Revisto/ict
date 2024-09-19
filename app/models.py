@@ -21,7 +21,7 @@ class Campaign(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)
     company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=False)
-    campaign_type = db.Column(db.String(20), nullable=False)
+    campaign_type = db.Column(db.String(20), nullable=False)  # 'score' or 'coupon'
     webservice_url = db.Column(db.String(200), nullable=True)
     scores = db.relationship('UserCampaignScore', backref='campaign', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -36,7 +36,8 @@ class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    score_increment = db.Column(db.Integer, nullable=False, default=0)
+    type = db.Column(db.String(20), nullable=False)  # 'score' or 'coupon'
+    company_id = db.Column(db.Integer, db.ForeignKey('company.id'), nullable=True)  # For private games
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Coupon(db.Model):

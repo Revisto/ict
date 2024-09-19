@@ -56,9 +56,13 @@ def delete_webservice_url(campaign_id):
 def select_games(campaign_id):
     game_ids = request.form.getlist('game_ids')
     for game_id in game_ids:
-        if CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first():
+        campaign_game = CampaignGame.query.filter_by(campaign_id=campaign_id, game_id=game_id).first()
+        if campaign_game:
             continue
+        campaign = Campaign.query.get(campaign_id)
         game = Game.query.get(game_id)
+        if game.type != campaign.campaign_type:
+            return jsonify({'message': 'Unallowed game.'}), 400
         embed_code = f'<script src="/static/js/widget.js" data-campaign-id="{campaign_id}" data-game-id="{game_id}"></script>'
         new_campaign_game = CampaignGame(campaign_id=campaign_id, game_id=game_id, embed_code=embed_code)
         db.session.add(new_campaign_game)

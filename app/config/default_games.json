@@ -1,0 +1,16 @@
+{
+    "games": [
+        {
+            "id": 1,
+            "name": "Sum Game (score)",
+            "description": "A game where you sum numbers.",
+            "type": "score"
+        },
+        {
+            "id": 2,
+            "name": "Sum Game (coupon)",
+            "description": "A game where you sum numbers.",
+            "type": "coupon"
+        }
+    ]
+}

@@ -1,0 +1,46 @@
+<!-- templates/games/sum_game_coupon.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sum Game</title>
+</head>
+<body>
+    <h1>Sum Game</h1>
+    {% if campaign.campaign_type == 'score' %}
+        <p>Score: <span id="userScore">{{ user_score.score if user_score else 0 }}</span></p>
+    {% endif %}
+    <div id="gameContainer"></div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var num1 = Math.floor(Math.random() * 10);
+            var num2 = Math.floor(Math.random() * 10);
+            var gameContainer = document.getElementById('gameContainer');
+            var question = document.createElement('p');
+            var input = document.createElement('input');
+            var button = document.createElement('button');
+
+            question.textContent = `What is ${num1} + ${num2}?`;
+            input.type = 'number';
+            input.required = true;
+            button.textContent = 'Submit';
+
+            gameContainer.appendChild(question);
+            gameContainer.appendChild(input);
+            gameContainer.appendChild(button);
+
+            button.addEventListener('click', function() {
+                var answer = parseInt(input.value, 10);
+                var correctAnswer = num1 + num2;
+
+                if (answer === correctAnswer) {
+                    alert('Correct!');
+                    getCoupon({{ campaign.id }});
+                } else {
+                    alert('Incorrect. Try again.');
+                }
+            });
+        });
+    </script>
+    <script src="http://127.0.0.1:5000/static/js/widget.js"></script>
+</body>
+</html>
