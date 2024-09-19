@@ -63,7 +63,7 @@ def select_games(campaign_id):
         game = Game.query.get(game_id)
         if game.type != campaign.campaign_type:
             return jsonify({'message': 'Unallowed game.'}), 400
-        embed_code = f'<script src="http://127.0.0.1:5000/static/js/widget.js" data-campaign-id="{campaign_id}" data-game-id="{game_id}"></script>'
+        embed_code = f'<script src="http://ict.revisto.lol/static/js/widget.js" data-campaign-id="{campaign_id}" data-game-id="{game_id}"></script>'
         new_campaign_game = CampaignGame(campaign_id=campaign_id, game_id=game_id, embed_code=embed_code)
         db.session.add(new_campaign_game)
     db.session.commit()
