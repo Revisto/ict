@@ -1,6 +1,6 @@
 # app/routes/campaign.py
 from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
-from app.models import Campaign, Coupon, Game, CampaignGame, UserCampaignScore
+from app.models import Campaign, Coupon, Game, CampaignGame, UserCampaignScore, User
 from app.services.analytics_service import log_general_event
 from app.decorators import company_required
 from app import db
@@ -81,5 +81,6 @@ def leaderboard(campaign_id):
         return jsonify({'message': 'Invalid campaign type.'}), 400
     
     # Query the leaderboard for the selected campaign
-    leaderboard = UserCampaignScore.query.filter_by(campaign_id=campaign_id).order_by(UserCampaignScore.score.desc()).all()
+    leaderboard = db.session.query(UserCampaignScore, User.telephone).join(User).filter(UserCampaignScore.campaign_id == campaign_id).order_by(UserCampaignScore.score.desc()).all()
+    
     return render_template('leaderboard.html', campaign=campaign, leaderboard=leaderboard)
