@@ -12,7 +12,7 @@ bp = Blueprint('dashboard', __name__)
 def dashboard():
     company_id = session['company_id']
     campaigns = Campaign.query.filter_by(company_id=company_id).order_by(Campaign.created_at.desc()).all()
-    games = Game.query.all()
+    games = Game.query.filter_by(company_id=None).all()
     company_games = Game.query.filter_by(company_id=company_id).all()
     games = games + company_games
     for campaign in campaigns:
