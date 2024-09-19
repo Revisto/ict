@@ -22,7 +22,6 @@ def popup(user, campaign_id, game_id):
     if campaign.campaign_type == 'score' and not user.telephone:
         return redirect(url_for('auth.authenticate'))
     
-    print("----------------")
     game_template = render_game_template(game, campaign_id)
     if game_template:
         return game_template
@@ -53,14 +52,12 @@ def add_score(user, campaign_id):
     if campaign.campaign_type != 'score':
         return jsonify({'message': 'Invalid campaign type.'}), 400
 
-    print(request.json)
     score_increment = request.json.get('score_increment', 0)
     user_score = UserCampaignScore.query.filter_by(user_id=user.id, campaign_id=campaign_id).first()
     if not user_score:
         user_score = UserCampaignScore(user_id=user.id, campaign_id=campaign_id, score=0)
         db.session.add(user_score)
 
-    print(score_increment)
     user_score.score += score_increment
     db.session.commit()
     return jsonify({'message': 'Score updated', 'score': user_score.score})
