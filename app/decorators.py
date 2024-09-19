@@ -11,7 +11,6 @@ def validate_uuid(f):
         if not auth_header:
             return jsonify({'message': 'Authorization header is required'}), 400
         uuid = auth_header.split(' ')[1] if ' ' in auth_header else None
-        print("uuid: ", uuid)
         if not uuid:
             return jsonify({'message': 'UUID is required'}), 400
         user = User.query.get(uuid)

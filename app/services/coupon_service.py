@@ -20,7 +20,7 @@ def handle_coupon_generation(campaign_id):
         if result:
             return result
 
-    return {'message': 'Sorry, no more coupons available.'}
+    return None
 
 def generate_public_coupon(campaign_id):
     coupon = Coupon.query.filter_by(campaign_id=campaign_id, type='public', used=False).first()

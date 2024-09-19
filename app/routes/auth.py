@@ -36,9 +36,7 @@ def authenticate(user):
         data = request.get_json()
         telephone = data['telephone']
         password = data['password']
-        print(telephone, password)
         existing_user = User.query.filter_by(telephone=telephone).first()
-        print(existing_user)
         if existing_user:
             # Option 1: There is already this unique telephone
             if check_password_hash(existing_user.password, password):

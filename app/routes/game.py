@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request, redirect, url_for, session
 from app.models import Campaign, Game, UserCampaignScore, Coupon, CampaignGame
 from app.decorators import company_required
 from app.services.game_service import render_game_template
+from app.services.coupon_service import handle_coupon_generation
 from app.decorators import validate_uuid
 from app import db
 
@@ -22,7 +23,6 @@ def popup(user, campaign_id, game_id):
     if campaign.campaign_type == 'score' and not user.telephone:
         return redirect(url_for('auth.authenticate'))
     
-    print("----------------")
     game_template = render_game_template(game, campaign_id)
     if game_template:
         return game_template
@@ -35,14 +35,12 @@ def get_coupon(user, campaign_id):
     campaign = Campaign.query.get_or_404(campaign_id)
     if campaign.campaign_type != 'coupon':
         return jsonify({'message': 'Invalid campaign type.'}), 400
-
-    coupon = Coupon.query.filter_by(campaign_id=campaign_id, used=False).first()
+    
+    coupon = handle_coupon_generation(campaign_id)
     if not coupon:
-        return jsonify({'message': 'No available coupons.'}), 404
+        return jsonify({'message': 'No coupons available.'}), 400
 
-    coupon.used = True
-    db.session.commit()
-    return jsonify({'coupon_code': coupon.code})
+    return jsonify(coupon)
 
 @bp.route('/game/add_score/<int:campaign_id>', methods=['POST'])
 @validate_uuid
@@ -53,14 +51,12 @@ def add_score(user, campaign_id):
     if campaign.campaign_type != 'score':
         return jsonify({'message': 'Invalid campaign type.'}), 400
 
-    print(request.json)
     score_increment = request.json.get('score_increment', 0)
     user_score = UserCampaignScore.query.filter_by(user_id=user.id, campaign_id=campaign_id).first()
     if not user_score:
         user_score = UserCampaignScore(user_id=user.id, campaign_id=campaign_id, score=0)
         db.session.add(user_score)
 
-    print(score_increment)
     user_score.score += score_increment
     db.session.commit()
     return jsonify({'message': 'Score updated', 'score': user_score.score})
