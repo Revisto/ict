@@ -28,6 +28,8 @@ Welcome to Campaign Generator! 🎉 Our platform allows various companies to dis
 
 Our software design focuses on modularity and scalability, using a microservices architecture to ensure each component can be developed, deployed, and scaled independently.
 
+![db diagram](./dbdiagram.png)
+
 ### Frontend
 
 - **Framework**: Tailwind CSS for a beautiful and responsive UI.
