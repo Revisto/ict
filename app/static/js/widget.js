@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
             widgetIcon.style.right = '20px';
             widgetIcon.style.width = '50px';
             widgetIcon.style.height = '50px';
-            widgetIcon.style.backgroundColor = '#f00';
+            widgetIcon.style.background = 'linear-gradient(45deg, #800080, #ff00ff)';
             widgetIcon.style.borderRadius = '50%';
             widgetIcon.style.cursor = 'pointer';
             widgetIcon.style.zIndex = '1000';
